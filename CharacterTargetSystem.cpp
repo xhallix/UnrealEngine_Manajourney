@@ -12,6 +12,17 @@ ACharacterTargetSystem::ACharacterTargetSystem()
 
 void ACharacterTargetSystem::findEnemyToTarget(ACharacter* player, UWorld* currentGameWorld)
 {
+
+	// clean up all previous focused enemies
+	for (TObjectIterator<ABasicEnemy> enemyFocusIterator; enemyFocusIterator; ++enemyFocusIterator)
+	{
+		if (enemyFocusIterator->GetWorld() == currentGameWorld)
+		{
+			ABasicEnemy* enemyChar = *enemyFocusIterator;
+			enemyChar->hideFocusComponent();		
+		}
+	}
+
 	findTargetByDistance(player, currentGameWorld);
 }
 
@@ -21,8 +32,6 @@ void ACharacterTargetSystem::findTargetByDistance(ACharacter* player, UWorld* cu
 	float distanceToPlayer;
 	float distanceToTarget = 1000.00f;
 	bool enemyFreeForTarget = false;
-
-	// TODO!!! BETTER USE TOBJECTITERATOR ONCE AND PUSH IT TO A GLOABL ARRAY IN MANACHAR
 
 	// check if one enemy has not been skipped yet
 	for (TObjectIterator<ABasicEnemy> enemyIterator; enemyIterator; ++enemyIterator)
@@ -51,7 +60,6 @@ void ACharacterTargetSystem::findTargetByDistance(ACharacter* player, UWorld* cu
 					enemyChar->bSkippedTarget = false;
 				}
 			}
-			
 		}
 	}
 
@@ -61,7 +69,6 @@ void ACharacterTargetSystem::findTargetByDistance(ACharacter* player, UWorld* cu
 		if (enemyFocusIterator->GetWorld() == currentGameWorld)
 		{
 			enemyChar = *enemyFocusIterator;
-			//		if (player && enemyChar && enemyChar->bSkippedTarget == false)
 			if (enemyChar && player && enemyChar->bSkippedTarget == false)
 			{
 				distanceToPlayer = enemyChar->GetDistanceTo(player);
@@ -71,7 +78,15 @@ void ACharacterTargetSystem::findTargetByDistance(ACharacter* player, UWorld* cu
 					enemyChar->toggleFocus();
 					targetedEnemy = enemyChar;
 					break;
+				} 
+				else
+				{
+					enemyChar->toggleFocus();
 				}
+			} 
+			else
+			{
+				enemyChar->toggleFocus();
 			}
 		}
 
